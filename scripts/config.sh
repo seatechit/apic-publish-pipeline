@@ -15,20 +15,21 @@ fi
 
 # Make a configuration files directory
 cd ..
-rm -rf config
 mkdir config
 cd config
 
 # Get the needed URLs for the automation
-APIC_ADMIN_URL=`oc get routes -n ${APIC_NAMESPACE} | grep admin |  awk '{print $2}'`
+CPD_URL=`oc get routes -n ${APIC_NAMESPACE} | grep cpd |  awk '{print $2}'`
+if [[ -z "${CPD_URL}" ]]; then echo "[ERROR][config.sh] - An error ocurred getting the CPD Admin url"; exit 1; fi
+APIC_ADMIN_URL=`oc get routes -n ${APIC_NAMESPACE} | grep platform-api |  awk '{print $2}'`
 if [[ -z "${APIC_ADMIN_URL}" ]]; then echo "[ERROR][config.sh] - An error ocurred getting the IBM API Connect Admin url"; exit 1; fi
-APIC_API_MANAGER_URL=`oc get routes -n ${APIC_NAMESPACE} | grep api-manager |  awk '{print $2}'`
+APIC_API_MANAGER_URL=`oc get routes -n ${APIC_NAMESPACE} | grep platform-api |  awk '{print $2}'`
 if [[ -z "${APIC_API_MANAGER_URL}" ]]; then echo "[ERROR][config.sh] - An error ocurred getting the IBM API Connect Management url"; exit 1; fi
 APIC_GATEWAY_URL=`oc get routes -n ${APIC_NAMESPACE} | grep gateway | grep -v manager | awk '{print $2}'`
 if [[ -z "${APIC_GATEWAY_URL}" ]]; then echo "[ERROR][config.sh] - An error ocurred getting the IBM API Connect Gateway url"; exit 1; fi
 APIC_GATEWAY_MANAGER_URL=`oc get routes -n ${APIC_NAMESPACE} | grep gateway-manager | awk '{print $2}'`
 if [[ -z "${APIC_GATEWAY_MANAGER_URL}" ]]; then echo "[ERROR][config.sh] - An error ocurred getting the IBM API Connect Gateway Manager url"; exit 1; fi
-APIC_ANALYTICS_CONSOLE_URL=`oc get routes -n ${APIC_NAMESPACE} | grep ac-endpoint | awk '{print $2}'`
+APIC_ANALYTICS_CONSOLE_URL=`oc get routes -n ${APIC_NAMESPACE} | grep ai-endpoint | awk '{print $2}'`
 if [[ -z "${APIC_ANALYTICS_CONSOLE_URL}" ]]; then echo "[ERROR][config.sh] - An error ocurred getting the IBM API Connect Analytics Console url"; exit 1; fi
 APIC_PORTAL_DIRECTOR_URL=`oc get routes -n ${APIC_NAMESPACE} | grep portal-director | awk '{print $2}'`
 if [[ -z "${APIC_PORTAL_DIRECTOR_URL}" ]]; then echo "[ERROR][config.sh] - An error ocurred getting the IBM API Connect Portal Director url"; exit 1; fi
@@ -36,6 +37,15 @@ APIC_PORTAL_WEB_URL=`oc get routes -n ${APIC_NAMESPACE} | grep portal-web | awk 
 if [[ -z "${APIC_PORTAL_WEB_URL}" ]]; then echo "[ERROR][config.sh] - An error ocurred getting the IBM API Connect Portal Web url"; exit 1; fi
 APIC_PLATFORM_API_URL=`oc get routes -n ${APIC_NAMESPACE} | grep platform-api | awk '{print $2}'`
 if [[ -z "${APIC_PLATFORM_API_URL}" ]]; then echo "[ERROR][config.sh] - An error ocurred getting the IBM API Connect Platform API url"; exit 1; fi
+
+# APIC_ADMIN_URL=${APIC_ADMIN_URL}/integration/apis/tools/apic-cluster
+# APIC_API_MANAGER_URL=${APIC_API_MANAGER_URL}/integration/apis/tools/apic-cluster/manager
+#APIC_GATEWAY_URL=${APIC_GATEWAY_URL}/integration/apis/tools/apic-cluster
+#APIC_GATEWAY_MANAGER_URL=${APIC_GATEWAY_MANAGER_URL}/integration/apis/tools/apic-cluster
+#APIC_ANALYTICS_CONSOLE_URL=${APIC_ANALYTICS_CONSOLE_URL}/integration/apis/tools/apic-cluster
+#APIC_PORTAL_DIRECTOR_URL=${APIC_PORTAL_DIRECTOR_URL}/integration/apis/tools/apic-cluster
+#APIC_PORTAL_WEB_URL=${APIC_PORTAL_WEB_URL}/integration/apis/tools/apic-cluster
+#APIC_PLATFORM_API_URL=${APIC_PLATFORM_API_URL}/integration/apis/tools/apic-cluster
 
 # Storing the urls in the JSON config file
 echo "{" >> config.json
@@ -52,12 +62,12 @@ echo "\"APIC_PLATFORM_API_URL\":\"${APIC_PLATFORM_API_URL}\"," >> config.json
 ADMIN_REALM="admin/default-idp-1"
 
 # Get the APIC CLI
-HTTP_CODE=`curl -s --write-out '%{http_code}' https://${APIC_ADMIN_URL}/client-downloads/toolkit-linux.tgz --insecure --output toolkit-linux.tgz`
-if [[ "${HTTP_CODE}" != "200" ]]
-then 
-  echo "[ERROR][config.sh] - An error ocurred downloading the APIC toolkit to get the APIC CLI"
-  exit 1
-fi
+# HTTP_CODE=`curl -s --write-out '%{http_code}' https://${APIC_ADMIN_URL}/client-downloads/toolkit-linux.tgz --insecure --output toolkit-linux.tgz`
+# if [[ "${HTTP_CODE}" != "200" ]]
+# then 
+#   echo "[ERROR][config.sh] - An error ocurred downloading the APIC toolkit to get the APIC CLI"
+#   exit 1
+# fi
 tar -zxvf toolkit-linux.tgz
 chmod +x apic-slim
 
@@ -74,9 +84,13 @@ echo "}" >> config.json
 ./apic-slim login --server ${APIC_ADMIN_URL} --username admin --password ''"${APIC_ADMIN_PASSWORD}"'' --realm ${ADMIN_REALM} --accept-license > /dev/null
 if [[ $? -ne 0 ]]; then echo "[ERROR][config.sh] - An error ocurred login into IBM API Connect using the APIC CLI"; exit 1; fi
 
+echo "${APIC_ADMIN_URL}"
+
 # Get the toolkit credentials
 ./apic-slim cloud-settings:toolkit-credentials-list --server ${APIC_ADMIN_URL} --format json > toolkit-creds.json
-if [[ $? -ne 0 ]]; then echo "[ERROR][config.sh] - An error ocurred getting the IBM API Connect Toolkit Credentials using the APIC CLI"; exit 1; fi
+# echo "listing folder"
+# ls -ltr
+# cat toolkit-creds.json
 
 # DEBUG information
 if [[ ! -z "${DEBUG}" ]]
