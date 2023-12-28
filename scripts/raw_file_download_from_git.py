@@ -28,6 +28,7 @@ def get_all_file_names_from_git_enterprise(git_base_url, git_branch, git_priv_to
         url = git_base_url.replace("https://github","https://api.github",1).replace(".com/",".com/repos/",1) + "contents/" + file_path_to_download + "?ref=" + git_branch
         curl_auth_header = "'Authorization: token " + git_priv_token + "'"
         cmd = "curl -k -H " + curl_auth_header + " '" + url + "'"
+        print(INFO + "curl url: " + cmd)
         print(INFO + "Getting all Products names from: ", url)
         download_file_from_git_res = shell_command.shcmd(cmd)
         files=list(json.loads(download_file_from_git_res['stdout']))

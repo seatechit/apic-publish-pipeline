@@ -6,6 +6,10 @@ FILE_NAME = "download_product_files_from_git.py"
 INFO = "[INFO]["+ FILE_NAME +"] - " 
 WORKING_DIR_BASIC = "../WORKSPACE"
 
+# Access and print all environment variables
+for key, value in os.environ.items():
+    print(f'{key}: {value}')
+
 def product_files_from_git():
     try:
         var_product_tuple = raw_file_download_from_git.get_all_file_names_from_git_enterprise(os.environ["GIT_PRODUCTS_APIS_URL"],
