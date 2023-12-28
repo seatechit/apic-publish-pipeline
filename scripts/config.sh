@@ -15,6 +15,7 @@ fi
 
 # Make a configuration files directory
 cd ..
+rm -rf config
 mkdir config
 cd config
 
