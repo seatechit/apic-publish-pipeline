@@ -15,9 +15,9 @@ fi
 
 # Make a configuration files directory
 cd ..
-rm -rf config
-mkdir config
-cd config
+rm -rf ${CONFIG_FILES_DIR}
+mkdir ${CONFIG_FILES_DIR}
+cd ${CONFIG_FILES_DIR}
 
 # copy toolkit to config folder
 cp ../toolkit/toolkit-linux.tgz ./toolkit-linux.tgz

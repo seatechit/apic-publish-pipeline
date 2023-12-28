@@ -114,6 +114,7 @@ def orchestrate():
 
         toolkit_credentials = utils.get_toolkit_credentials(os.environ["CONFIG_FILES_DIR"])
         environment_config = utils.get_env_config(os.environ["CONFIG_FILES_DIR"])
+        print(INFO + "environment_config: ",environment_config)
 
         var_product_tuple = raw_file_download_from_git.get_all_file_names_from_git_enterprise(os.environ["GIT_PRODUCTS_APIS_URL"],
                                                                                             os.environ["GIT_PRODUCTS_APIS_BRANCH"],
@@ -148,7 +149,7 @@ def orchestrate():
                                                                     WORKING_DIR_BASIC,
                                                                     product_file_name,
                                                                     var_bearer_token)
-                # print("publish_resp: ",publish_resp)
+                print("publish_resp: ",publish_resp)
                 if "errorresponse" in publish_resp:
                     apic_publish_audit[product_file_name] = "FAILED" + publish_resp['errorresponse']
                 elif "state" in publish_resp:
