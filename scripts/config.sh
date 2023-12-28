@@ -19,6 +19,9 @@ rm -rf config
 mkdir config
 cd config
 
+# copy toolkit to config folder
+cp ../toolkit/toolkit-linux.tgz ./toolkit-linux.tgz
+
 # Get the needed URLs for the automation
 CPD_URL=`oc get routes -n ${APIC_NAMESPACE} | grep cpd |  awk '{print $2}'`
 if [[ -z "${CPD_URL}" ]]; then echo "[ERROR][config.sh] - An error ocurred getting the CPD Admin url"; exit 1; fi
