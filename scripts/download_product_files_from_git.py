@@ -7,8 +7,8 @@ INFO = "[INFO]["+ FILE_NAME +"] - "
 WORKING_DIR_BASIC = "../WORKSPACE"
 
 # Access and print all environment variables
-for key, value in os.environ.items():
-    print(f'{key}: {value}')
+# for key, value in os.environ.items():
+#     print(f'{key}: {value}')
 
 def product_files_from_git():
     try:
